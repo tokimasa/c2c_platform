@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarketFlow — 二手交易平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ─── Reset & Base ─────────────────────────────────── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{
+  --orange:#F5520C;
+  --orange-hover:#D94409;
+  --orange-light:#FEF0EB;
+  --orange-mid:#FDDDCF;
+  --blue:#1E40AF;
+  --green:#15803D;
+  --yellow:#D97706;
+  --red:#DC2626;
+
+  --bg:#F7F5F2;
+  --surface:#FFFFFF;
+  --surface2:#FAFAF8;
+  --text:#111110;
+  --text2:#555550;
+  --text3:#999992;
+  --border:#E8E6E1;
+  --border2:#D4D1CA;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+  --shadow:0 2px 8px rgba(0,0,0,.08);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.12);
+  --r:10px;
+  --r-lg:16px;
+  --r-xl:22px;
+  --nav:64px;
+  --font-body:'Noto Sans TC',sans-serif;
+  --font-display:'DM Serif Display',serif;
+  --transition:.18s ease;
+}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+img{display:block;max-width:100%}
+
+/* ─── Utility ───────────────────────────────────────── */
+.hidden{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.flex{display:flex}.items-center{align-items:center}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}
+.ml-auto{margin-left:auto}
+.truncate{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.line-clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ─── Scrollbar ─────────────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* ─── Animations ────────────────────────────────────── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes heartPop{0%{transform:scale(1)}40%{transform:scale(1.35)}70%{transform:scale(.9)}100%{transform:scale(1)}}
+.anim-fade{animation:fadeIn .28s ease both}
+.anim-slide{animation:slideUp .32s ease both}
+.anim-pop{animation:popIn .22s ease both}
+.anim-d1{animation-delay:.05s}.anim-d2{animation-delay:.1s}.anim-d3{animation-delay:.15s}.anim-d4{animation-delay:.2s}
+
+/* ─── NAV ───────────────────────────────────────────── */
+#nav{position:sticky;top:0;z-index:200;height:var(--nav);background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center}
+.nav-inner{max-width:1360px;margin:0 auto;width:100%;padding:0 28px;display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:baseline;gap:2px;cursor:pointer;user-select:none}
+.logo-mark{font-family:var(--font-display);font-size:24px;color:var(--orange);letter-spacing:-.5px}
+.logo-word{font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-left:2px}
+.nav-search{flex:1;max-width:500px;position:relative}
+.nav-search input{width:100%;height:40px;padding:0 44px 0 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:99px;font-size:14px;outline:none;transition:border-color var(--transition),box-shadow var(--transition)}
+.nav-search input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,82,12,.1)}
+.nav-search input::placeholder{color:var(--text3)}
+.search-submit{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);display:flex;align-items:center;transition:color var(--transition)}
+.search-submit:hover{color:var(--orange)}
+.nav-actions{display:flex;align-items:center;gap:6px;margin-left:auto}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:background var(--transition),color var(--transition);position:relative}
+.icon-btn:hover{background:var(--bg);color:var(--text)}
+.badge-dot{position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--orange);border-radius:50%;border:2px solid #fff}
+.nav-avatar{width:34px;height:34px;border-radius:50%;background:var(--orange-light);border:2px solid var(--orange-mid);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--orange);cursor:pointer}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 18px;height:38px;border-radius:99px;font-size:13px;font-weight:600;cursor:pointer;transition:all var(--transition);border:none;letter-spacing:.01em;white-space:nowrap}
+.btn-ghost{background:none;border:1.5px solid var(--border);color:var(--text2)}.btn-ghost:hover{border-color:var(--border2);color:var(--text);background:var(--bg)}
+.btn-primary{background:var(--orange);color:#fff}.btn-primary:hover{background:var(--orange-hover);transform:translateY(-1px);box-shadow:0 4px 12px rgba(245,82,12,.3)}
+.btn-primary:active{transform:translateY(0);box-shadow:none}
+.btn-lg{height:46px;padding:0 28px;font-size:15px;border-radius:99px}
+.btn-sm{height:32px;padding:0 14px;font-size:12px}
+
+/* ─── CATEGORY BAR ──────────────────────────────────── */
+#catbar{background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+#catbar::-webkit-scrollbar{display:none}
+.cat-inner{max-width:1360px;margin:0 auto;padding:0 28px;display:flex;align-items:center;gap:4px;height:46px}
+.cat-pill{padding:5px 14px;border-radius:99px;font-size:13px;cursor:pointer;white-space:nowrap;transition:all var(--transition);color:var(--text2);user-select:none}
+.cat-pill:hover{background:var(--bg);color:var(--text)}
+.cat-pill.active{background:var(--orange);color:#fff;font-weight:600}
+.cat-sep{width:1px;height:18px;background:var(--border);flex-shrink:0;margin:0 4px}
+
+/* ─── PAGE CONTAINER ────────────────────────────────── */
+.page{display:none;animation:fadeIn .25s ease both}
+.page.active{display:block}
+.container{max-width:1360px;margin:0 auto;padding:0 28px}
+
+/* ─── HOME PAGE ─────────────────────────────────────── */
+#page-home .layout{display:grid;grid-template-columns:220px 1fr;gap:24px;padding:24px 0 48px}
+
+/* sidebar */
+.sidebar{display:flex;flex-direction:column;gap:14px}
+.filter-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;box-shadow:var(--shadow-sm)}
+.filter-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.filter-title{font-size:13px;font-weight:700;color:var(--text);letter-spacing:.02em;text-transform:uppercase}
+.filter-clear{font-size:12px;color:var(--orange);cursor:pointer;font-weight:500}
+.filter-clear:hover{text-decoration:underline}
+.check-row{display:flex;align-items:center;gap:10px;padding:5px 0;cursor:pointer;user-select:none}
+.check-row:hover .custom-cb{border-color:var(--orange)}
+.custom-cb{width:17px;height:17px;border:1.5px solid var(--border2);border-radius:5px;display:flex;align-items:center;justify-content:center;transition:all var(--transition);flex-shrink:0}
+.custom-cb.on{background:var(--orange);border-color:var(--orange)}
+.custom-cb svg{display:none}
+.custom-cb.on svg{display:block}
+.check-label{font-size:13px;color:var(--text2);flex:1;line-height:1.4}
+.check-count{font-size:11px;color:var(--text3)}
+.price-inputs{display:flex;align-items:center;gap:8px;margin-top:4px}
+.price-field{flex:1;height:34px;padding:0 10px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;outline:none;transition:border-color var(--transition)}
+.price-field:focus{border-color:var(--orange)}
+.price-dash{color:var(--text3);font-size:13px}
+.quick-prices{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.qp-tag{padding:4px 11px;border-radius:99px;border:1px solid var(--border);font-size:12px;cursor:pointer;color:var(--text2);transition:all var(--transition)}
+.qp-tag:hover,.qp-tag.on{border-color:var(--orange);color:var(--orange);background:var(--orange-light)}
+.cond-wrap{display:flex;flex-wrap:wrap;gap:6px}
+.cond-tag{padding:5px 13px;border-radius:99px;border:1.5px solid var(--border);font-size:12px;cursor:pointer;color:var(--text2);transition:all var(--transition);user-select:none}
+.cond-tag:hover{border-color:var(--border2);color:var(--text)}
+.cond-tag.on{border-color:var(--orange);color:var(--orange);background:var(--orange-light);font-weight:600}
+
+/* content area */
+.content-area{}
+.hero-banner{background:var(--orange);border-radius:var(--r-xl);padding:28px 32px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;overflow:hidden;position:relative}
+.hero-banner::before{content:'';position:absolute;right:-40px;top:-60px;width:200px;height:200px;background:rgba(255,255,255,.08);border-radius:50%}
+.hero-banner::after{content:'';position:absolute;right:60px;bottom:-80px;width:160px;height:160px;background:rgba(255,255,255,.06);border-radius:50%}
+.hero-text h2{font-family:var(--font-display);font-size:28px;color:#fff;line-height:1.2;margin-bottom:6px}
+.hero-text p{font-size:14px;color:rgba(255,255,255,.82);margin-bottom:16px}
+.hero-cta{padding:10px 22px;background:#fff;color:var(--orange);border-radius:99px;font-size:14px;font-weight:700;cursor:pointer;border:none;position:relative;z-index:1;transition:transform var(--transition),box-shadow var(--transition)}
+.hero-cta:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.hero-emoji{font-size:72px;position:relative;z-index:1;user-select:none}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.result-info{font-size:13px;color:var(--text2)}
+.result-info strong{color:var(--text);font-weight:700}
+.sort-wrap{display:flex;align-items:center;gap:8px}
+.sort-label{font-size:12px;color:var(--text3)}
+.sort-sel{height:34px;padding:0 32px 0 12px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;outline:none;background:var(--surface);color:var(--text);cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999992' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color var(--transition)}
+.sort-sel:focus{border-color:var(--orange)}
+
+/* product grid */
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:14px}
+.prod-card{background:var(--surface);border-radius:var(--r-lg);border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:transform var(--transition),box-shadow var(--transition);position:relative}
+.prod-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:transparent}
+.prod-card:hover .prod-overlay{opacity:1}
+.prod-img{width:100%;aspect-ratio:1;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:44px;position:relative;overflow:hidden}
+.prod-overlay{position:absolute;inset:0;background:rgba(0,0,0,.03);opacity:0;transition:opacity var(--transition)}
+.prod-status{position:absolute;top:8px;left:8px;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.03em;z-index:1}
+.status-hot{background:#FEF2F2;color:#DC2626}
+.status-new{background:#EFF6FF;color:#1D4ED8}
+.status-sold{background:rgba(0,0,0,.55);color:#fff}
+.prod-heart{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.9);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;z-index:1;transition:transform var(--transition),box-shadow var(--transition);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.prod-heart:hover{transform:scale(1.12);box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.prod-heart.popping{animation:heartPop .35s ease}
+.prod-body{padding:11px 13px}
+.prod-name{font-size:13px;color:var(--text);margin-bottom:5px;line-height:1.45}
+.prod-price{font-size:17px;font-weight:800;color:var(--orange);margin-bottom:5px;letter-spacing:-.3px}
+.prod-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.prod-cond{font-size:10px;padding:2px 8px;border-radius:99px;background:var(--bg);color:var(--text2);font-weight:600}
+.prod-stars{font-size:11px;color:var(--text2)}
+.prod-views{font-size:11px;color:var(--text3)}
+.prod-views::before{content:'·';margin-right:3px}
+
+/* sold overlay */
+.sold-overlay{position:absolute;inset:0;background:rgba(255,255,255,.7);display:flex;align-items:center;justify-content:center;border-radius:var(--r-lg);z-index:2}
+.sold-tag{background:rgba(0,0,0,.65);color:#fff;padding:8px 18px;border-radius:99px;font-size:13px;font-weight:700;letter-spacing:.04em}
+
+/* load more */
+.load-more-wrap{text-align:center;margin-top:32px}
+.load-more{padding:12px 36px;border-radius:99px;border:1.5px solid var(--border);background:var(--surface);font-size:14px;font-weight:600;cursor:pointer;transition:all var(--transition);color:var(--text2)}
+.load-more:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-light)}
+
+/* ─── PRODUCT DETAIL PAGE ───────────────────────────── */
+#page-detail .detail-layout{display:grid;grid-template-columns:1fr 420px;gap:32px;padding:28px 0 48px}
+.gallery-wrap{position:sticky;top:calc(var(--nav)+20px);align-self:start}
+.gallery-main{width:100%;aspect-ratio:1;background:var(--surface);border-radius:var(--r-xl);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:100px;margin-bottom:12px;overflow:hidden}
+.gallery-thumbs{display:flex;gap:8px}
+.thumb{width:60px;height:60px;border-radius:var(--r);background:var(--bg);border:2px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:22px;transition:border-color var(--transition)}
+.thumb:hover,.thumb.active{border-color:var(--orange)}
+.detail-info{display:flex;flex-direction:column;gap:20px}
+.detail-header{}
+.detail-title{font-size:20px;font-weight:700;line-height:1.4;margin-bottom:8px;color:var(--text)}
+.detail-price{font-size:34px;font-weight:900;color:var(--orange);letter-spacing:-1px;margin-bottom:2px}
+.detail-price span{font-size:16px;font-weight:600;color:var(--text2)}
+.detail-taxes{font-size:12px;color:var(--text3)}
+.detail-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.detail-tag{padding:4px 12px;border-radius:99px;background:var(--bg);border:1px solid var(--border);font-size:12px;color:var(--text2);cursor:pointer}
+.detail-tag:hover{border-color:var(--orange);color:var(--orange)}
+.detail-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px}
+.ds-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;letter-spacing:.02em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.meta-item{padding:10px 12px;background:var(--bg);border-radius:var(--r);display:flex;flex-direction:column;gap:2px}
+.meta-key{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.meta-val{font-size:13px;color:var(--text);font-weight:600}
+.seller-row{display:flex;align-items:center;gap:12px}
+.seller-ava{width:48px;height:48px;border-radius:50%;background:var(--orange-light);border:2px solid var(--orange-mid);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--orange);flex-shrink:0;cursor:pointer}
+.seller-info{flex:1}
+.seller-name{font-size:15px;font-weight:700;cursor:pointer}
+.seller-name:hover{color:var(--orange)}
+.seller-stats{font-size:12px;color:var(--text2);margin-top:2px}
+.seller-btn{padding:7px 16px;border-radius:99px;border:1.5px solid var(--border);background:none;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);transition:all var(--transition);white-space:nowrap}
+.seller-btn:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-light)}
+.detail-desc{font-size:14px;color:var(--text2);line-height:1.75;white-space:pre-line}
+.action-bar{display:flex;gap:10px}
+.action-bar .btn-primary{flex:1;height:50px;font-size:15px;letter-spacing:.02em}
+.action-bar .heart-action{width:50px;height:50px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:20px;flex-shrink:0;transition:all var(--transition)}
+.action-bar .heart-action:hover{border-color:var(--orange);background:var(--orange-light)}
+.safe-badges{display:flex;gap:8px;flex-wrap:wrap}
+.safe-badge{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:var(--r);background:var(--bg);font-size:12px;color:var(--text2)}
+.safe-badge span{font-size:16px}
+
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 0;font-size:14px;color:var(--text2);cursor:pointer;margin-bottom:4px;transition:color var(--transition)}
+.back-btn:hover{color:var(--orange)}
+.back-btn svg{transition:transform var(--transition)}
+.back-btn:hover svg{transform:translateX(-3px)}
+
+/* comments section */
+.comments-section{margin-top:0}
+.comment-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+.comment-item:last-child{border-bottom:none}
+.cmt-ava{width:36px;height:36px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.cmt-body{}
+.cmt-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
+.cmt-stars{color:#F59E0B;font-size:12px;margin-bottom:4px}
+.cmt-text{font-size:13px;color:var(--text2);line-height:1.6}
+.cmt-date{font-size:11px;color:var(--text3);margin-top:4px}
+
+/* related products */
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+
+/* ─── PROFILE / MY PAGE ─────────────────────────────── */
+#page-profile .profile-layout{padding:28px 0 48px}
+.profile-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px;display:flex;align-items:center;gap:24px;margin-bottom:24px}
+.profile-ava-lg{width:80px;height:80px;border-radius:50%;background:var(--orange-light);border:3px solid var(--orange-mid);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:var(--orange);flex-shrink:0}
+.profile-info h2{font-size:22px;font-weight:800;margin-bottom:4px}
+.profile-info p{font-size:13px;color:var(--text2);margin-bottom:12px}
+.profile-stats{display:flex;gap:20px}
+.pstat{text-align:center}
+.pstat-val{font-size:20px;font-weight:800;color:var(--text)}
+.pstat-key{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em}
+.profile-tabs{display:flex;gap:4px;background:var(--bg);border-radius:var(--r-xl);padding:5px;margin-bottom:20px;border:1px solid var(--border)}
+.ptab{flex:1;padding:9px;border-radius:var(--r-lg);border:none;background:none;font-size:14px;font-weight:600;cursor:pointer;color:var(--text2);transition:all var(--transition)}
+.ptab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.ptab-content{display:none}
+.ptab-content.active{display:block;animation:fadeIn .22s ease}
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.empty-state{text-align:center;padding:48px 24px;color:var(--text3)}
+.empty-state .es-icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:14px}
+
+/* order history */
+.order-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;display:flex;align-items:center;gap:14px;margin-bottom:10px;transition:box-shadow var(--transition);cursor:pointer}
+.order-item:hover{box-shadow:var(--shadow)}
+.order-thumb{width:60px;height:60px;border-radius:var(--r);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.order-info{flex:1}
+.order-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
+.order-price{font-size:16px;font-weight:800;color:var(--orange)}
+.order-date{font-size:12px;color:var(--text3);margin-top:2px}
+.order-status{padding:4px 12px;border-radius:99px;font-size:12px;font-weight:700}
+.os-done{background:#F0FDF4;color:#15803D}
+.os-ship{background:#EFF6FF;color:#1D4ED8}
+.os-cancel{background:#FEF2F2;color:#DC2626}
+
+/* reviews */
+.review-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;margin-bottom:10px}
+.review-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.rev-ava{width:36px;height:36px;border-radius:50%;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px}
+.rev-name{font-size:13px;font-weight:700}
+.rev-stars{color:#F59E0B;font-size:13px}
+.rev-date{font-size:11px;color:var(--text3);margin-left:auto}
+.rev-text{font-size:13px;color:var(--text2);line-height:1.65}
+
+/* ─── SELL MODAL ────────────────────────────────────── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s ease;padding:20px}
+.modal-box{background:var(--surface);border-radius:var(--r-xl);width:100%;max-width:540px;max-height:90vh;overflow-y:auto;animation:popIn .22s ease;box-shadow:var(--shadow-lg)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:22px 24px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1;border-radius:var(--r-xl) var(--r-xl) 0 0}
+.modal-head h3{font-size:17px;font-weight:800;color:var(--text)}
+.modal-close{width:32px;height:32px;border-radius:50%;border:none;background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);transition:all var(--transition)}
+.modal-close:hover{background:var(--border);color:var(--text)}
+.modal-body{padding:22px 24px}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:13px;font-weight:700;color:var(--text);margin-bottom:7px;letter-spacing:.01em}
+.form-label span{color:var(--orange)}
+.form-input{width:100%;height:42px;padding:0 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;outline:none;background:var(--surface);color:var(--text);transition:border-color var(--transition)}
+.form-input:focus{border-color:var(--orange)}
+.form-input::placeholder{color:var(--text3)}
+.form-select{width:100%;height:42px;padding:0 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;outline:none;background:var(--surface);color:var(--text);cursor:pointer;transition:border-color var(--transition);appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999992' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.form-select:focus{border-color:var(--orange)}
+.form-textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;outline:none;background:var(--surface);color:var(--text);transition:border-color var(--transition);resize:vertical;min-height:90px;line-height:1.6}
+.form-textarea:focus{border-color:var(--orange)}
+.form-textarea::placeholder{color:var(--text3)}
+.price-input-wrap{display:flex;align-items:center;gap:0;border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color var(--transition)}
+.price-input-wrap:focus-within{border-color:var(--orange)}
+.price-prefix{padding:0 12px;height:42px;display:flex;align-items:center;background:var(--bg);font-size:14px;color:var(--text2);border-right:1px solid var(--border)}
+.price-input-wrap input{flex:1;height:42px;padding:0 12px;border:none;outline:none;font-size:14px;background:var(--surface);color:var(--text)}
+.photo-upload{border:2px dashed var(--border);border-radius:var(--r-lg);padding:28px 20px;text-align:center;cursor:pointer;transition:all var(--transition);background:var(--bg)}
+.photo-upload:hover{border-color:var(--orange);background:var(--orange-light)}
+.photo-upload .up-icon{font-size:32px;margin-bottom:8px}
+.photo-upload p{font-size:13px;color:var(--text2);margin-bottom:3px}
+.photo-upload span{font-size:12px;color:var(--text3)}
+.photo-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.photo-prev{width:64px;height:64px;border-radius:var(--r);background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;position:relative;cursor:pointer;overflow:hidden}
+.photo-prev:hover::after{content:'✕';position:absolute;inset:0;background:rgba(0,0,0,.5);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+.cond-select{display:flex;gap:7px;flex-wrap:wrap}
+.cond-sel-item{flex:1;min-width:80px;padding:8px 6px;border:1.5px solid var(--border);border-radius:var(--r);text-align:center;cursor:pointer;transition:all var(--transition);user-select:none}
+.cond-sel-item .csi-label{font-size:13px;font-weight:600;display:block;margin-bottom:1px;color:var(--text2)}
+.cond-sel-item .csi-desc{font-size:11px;color:var(--text3);display:block}
+.cond-sel-item:hover{border-color:var(--border2)}
+.cond-sel-item.on{border-color:var(--orange);background:var(--orange-light)}
+.cond-sel-item.on .csi-label{color:var(--orange)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-foot{padding:18px 24px;border-top:1px solid var(--border);display:flex;gap:10px}
+.modal-foot .btn-primary{flex:1;height:46px;font-size:15px;font-weight:700}
+
+/* ─── TOAST ─────────────────────────────────────────── */
+#toast-container{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{padding:12px 22px;border-radius:99px;font-size:14px;font-weight:600;color:#fff;background:var(--text);box-shadow:var(--shadow-lg);animation:slideUp .25s ease;pointer-events:none;white-space:nowrap}
+.toast.success{background:#15803D}
+.toast.error{background:#DC2626}
+.toast.info{background:var(--orange)}
+
+/* ─── FAB ────────────────────────────────────────────── */
+#fab{position:fixed;bottom:32px;right:32px;width:56px;height:56px;border-radius:50%;background:var(--orange);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(245,82,12,.4);transition:transform var(--transition),box-shadow var(--transition);z-index:100}
+#fab:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(245,82,12,.5)}
+#fab:active{transform:scale(.97)}
+#fab svg{transition:transform .3s ease}
+#fab:hover svg{transform:rotate(90deg)}
+
+/* ─── CHAT / PURCHASE FLOW ───────────────────────────── */
+.purchase-modal .modal-box{max-width:420px}
+.chat-messages{height:260px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg);border-radius:var(--r-lg);margin-bottom:14px}
+.msg{max-width:78%;animation:fadeIn .2s ease}
+.msg-bubble{padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.55}
+.msg.received{align-self:flex-start}.msg.received .msg-bubble{background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:4px 16px 16px 16px}
+.msg.sent{align-self:flex-end}.msg.sent .msg-bubble{background:var(--orange);color:#fff;border-radius:16px 16px 4px 16px}
+.msg-name{font-size:11px;color:var(--text3);margin-bottom:3px}
+.msg-input-row{display:flex;gap:8px}
+.msg-input{flex:1;height:40px;padding:0 14px;border:1.5px solid var(--border);border-radius:99px;outline:none;font-size:14px;transition:border-color var(--transition)}
+.msg-input:focus{border-color:var(--orange)}
+.msg-send{width:40px;height:40px;border-radius:50%;background:var(--orange);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background var(--transition)}
+.msg-send:hover{background:var(--orange-hover)}
+
+/* ─── SEARCH SUGGESTIONS ─────────────────────────────── */
+.search-dropdown{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);overflow:hidden;z-index:300;animation:popIn .18s ease}
+.sugg-item{padding:10px 16px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:10px;color:var(--text2);transition:background var(--transition)}
+.sugg-item:hover{background:var(--bg);color:var(--text)}
+.sugg-icon{color:var(--text3);flex-shrink:0}
+
+/* ─── PROGRESS STEPS ────────────────────────────────── */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:22px}
+.step{display:flex;align-items:center;gap:8px;flex:1}
+.step-circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0;transition:all var(--transition)}
+.step.active .step-circle{border-color:var(--orange);background:var(--orange);color:#fff}
+.step.done .step-circle{border-color:var(--green);background:var(--green);color:#fff}
+.step-label{font-size:12px;color:var(--text3);white-space:nowrap}
+.step.active .step-label{color:var(--text);font-weight:600}
+.step-line{flex:1;height:2px;background:var(--border);margin:0 8px}
+.step.done .step-line{background:var(--green)}
+
+/* ─── RESPONSIVE ─────────────────────────────────────── */
+@media(max-width:1024px){
+  #page-home .layout{grid-template-columns:200px 1fr;gap:18px}
+  #page-detail .detail-layout{grid-template-columns:1fr 360px}
+}
+@media(max-width:768px){
+  .nav-inner{padding:0 16px;gap:12px}
+  .logo-word{display:none}
+  #page-home .layout{grid-template-columns:1fr;gap:0}
+  .sidebar{display:none}
+  #page-detail .detail-layout{grid-template-columns:1fr}
+  .gallery-wrap{position:static}
+  .container{padding:0 16px}
+  .cat-inner{padding:0 16px}
+  .prod-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+  .hero-emoji{display:none}
+  .hero-text h2{font-size:22px}
+  #fab{bottom:20px;right:20px}
+  .profile-hero{flex-direction:column;text-align:center}
+  .profile-stats{justify-content:center}
+  .detail-info{gap:16px}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══════════════════════════════════════════ -->
+<nav id="nav">
+  <div class="nav-inner">
+    <div class="logo" onclick="goHome()">
+      <div class="logo-mark">Market<span style="color:var(--text)">Flow</span></div>
+      <div class="logo-word">二手交易</div>
+    </div>
+    <div class="nav-search">
+      <input type="text" id="navSearch" placeholder="搜尋商品、品牌、關鍵字..." autocomplete="off"
+        oninput="onSearchInput(this.value)" onkeydown="onSearchKey(event)">
+      <button class="search-submit" onclick="doSearch()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
+      <div class="search-dropdown hidden" id="searchDropdown"></div>
+    </div>
+    <div class="nav-actions">
+      <button class="icon-btn" onclick="showPage('notifications')" title="通知">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="badge-dot"></div>
+      </button>
+      <button class="icon-btn" onclick="showPage('messages')" title="訊息">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </button>
+      <div class="nav-avatar" onclick="goProfile()" title="我的頁面">A</div>
+      <button class="btn btn-primary" onclick="openSellModal()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        出品
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ CATEGORY BAR ═══════════════════════════════════ -->
+<div id="catbar">
+  <div class="cat-inner">
+    <div class="cat-pill active" onclick="filterCat(this,'全部')">全部</div>
+    <div class="cat-sep"></div>
+    <div class="cat-pill" onclick="filterCat(this,'女裝')">👗 女裝</div>
+    <div class="cat-pill" onclick="filterCat(this,'男裝')">👔 男裝</div>
+    <div class="cat-pill" onclick="filterCat(this,'包款')">👜 包款</div>
+    <div class="cat-pill" onclick="filterCat(this,'3C電子')">📱 3C電子</div>
+    <div class="cat-pill" onclick="filterCat(this,'遊戲')">🎮 遊戲</div>
+    <div class="cat-pill" onclick="filterCat(this,'書籍')">📚 書籍</div>
+    <div class="cat-pill" onclick="filterCat(this,'家居')">🏠 家居</div>
+    <div class="cat-pill" onclick="filterCat(this,'美妝')">🌸 美妝</div>
+    <div class="cat-pill" onclick="filterCat(this,'運動')">⚽ 運動</div>
+    <div class="cat-pill" onclick="filterCat(this,'玩具')">🧸 玩具</div>
+    <div class="cat-pill" onclick="filterCat(this,'音樂')">🎵 音樂</div>
+    <div class="cat-pill" onclick="filterCat(this,'汽機車')">🚗 汽機車</div>
+    <div class="cat-pill" onclick="filterCat(this,'寵物')">🐾 寵物</div>
+  </div>
+</div>
+
+<!-- ═══ HOME PAGE ═══════════════════════════════════════ -->
+<div id="page-home" class="page active">
+  <div class="container">
+    <div class="layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="filter-card anim-fade">
+          <div class="filter-head">
+            <div class="filter-title">商品狀態</div>
+            <div class="filter-clear" onclick="clearCond()">清除</div>
+          </div>
+          <div class="cond-wrap" id="condFilter">
+            <div class="cond-tag" onclick="toggleCond(this)" data-val="全新">全新</div>
+            <div class="cond-tag on" onclick="toggleCond(this)" data-val="近全新">近全新</div>
+            <div class="cond-tag on" onclick="toggleCond(this)" data-val="良好">良好</div>
+            <div class="cond-tag" onclick="toggleCond(this)" data-val="可接受">可接受</div>
+          </div>
+        </div>
+        <div class="filter-card anim-fade anim-d1">
+          <div class="filter-head"><div class="filter-title">價格範圍</div></div>
+          <div class="price-inputs">
+            <input class="price-field" type="number" placeholder="最低" id="minP">
+            <span class="price-dash">—</span>
+            <input class="price-field" type="number" placeholder="最高" id="maxP">
+          </div>
+          <div class="quick-prices">
+            <div class="qp-tag" onclick="setQP(this,0,500)">~500</div>
+            <div class="qp-tag" onclick="setQP(this,500,2000)">500~2k</div>
+            <div class="qp-tag" onclick="setQP(this,2000,10000)">2k~1萬</div>
+            <div class="qp-tag" onclick="setQP(this,10000,0)">1萬以上</div>
+          </div>
+        </div>
+        <div class="filter-card anim-fade anim-d2">
+          <div class="filter-head"><div class="filter-title">賣家評分</div></div>
+          <div class="check-row" onclick="toggleCheck(this)">
+            <div class="custom-cb on"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="check-label">⭐⭐⭐⭐⭐ 5.0 滿分</div>
+            <div class="check-count">1.2k</div>
+          </div>
+          <div class="check-row" onclick="toggleCheck(this)">
+            <div class="custom-cb"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="check-label">⭐⭐⭐⭐ 4.0 以上</div>
+            <div class="check-count">3.4k</div>
+          </div>
+          <div class="check-row" onclick="toggleCheck(this)">
+            <div class="custom-cb"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="check-label">⭐⭐⭐ 3.0 以上</div>
+            <div class="check-count">5.1k</div>
+          </div>
+        </div>
+        <div class="filter-card anim-fade anim-d3">
+          <div class="filter-head"><div class="filter-title">配送方式</div></div>
+          <div class="check-row" onclick="toggleCheck(this)">
+            <div class="custom-cb on"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="check-label">📦 超商取貨</div>
+          </div>
+          <div class="check-row" onclick="toggleCheck(this)">
+            <div class="custom-cb on"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="check-label">🚚 宅配到府</div>
+          </div>
+          <div class="check-row" onclick="toggleCheck(this)">
+            <div class="custom-cb"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="check-label">🤝 面交自取</div>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;height:44px;border-radius:var(--r-lg)" onclick="applyFilters()">套用篩選</button>
+      </aside>
+
+      <!-- Content -->
+      <div class="content-area">
+        <div class="hero-banner anim-fade">
+          <div class="hero-text">
+            <h2>全台最大<br>二手交易社群</h2>
+            <p>安全・便捷・環保，每天數萬件商品等你發掘</p>
+            <button class="hero-cta" onclick="openSellModal()">立即出品</button>
+          </div>
+          <div class="hero-emoji">🛍️</div>
+        </div>
+
+        <div class="toolbar anim-fade anim-d1">
+          <div class="result-info">找到 <strong id="resultCount">24</strong> 件商品</div>
+          <div class="sort-wrap">
+            <span class="sort-label">排序</span>
+            <select class="sort-sel" onchange="sortBy(this.value)">
+              <option value="newest">最新上架</option>
+              <option value="price_asc">價格由低到高</option>
+              <option value="price_desc">價格由高到低</option>
+              <option value="popular">最多人關注</option>
+              <option value="rating">賣家評分</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="prod-grid anim-fade anim-d2" id="prodGrid"></div>
+
+        <div class="load-more-wrap">
+          <button class="load-more" onclick="loadMore()">載入更多商品</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DETAIL PAGE ════════════════════════════════════ -->
+<div id="page-detail" class="page">
+  <div class="container">
+    <div class="back-btn anim-fade" onclick="goHome()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      返回商品列表
+    </div>
+    <div class="detail-layout">
+      <!-- Gallery -->
+      <div class="gallery-wrap anim-fade">
+        <div class="gallery-main" id="galleryMain"></div>
+        <div class="gallery-thumbs" id="galleryThumbs"></div>
+        <div class="detail-section" style="margin-top:16px">
+          <div class="ds-title">💬 留言區</div>
+          <div id="comments"></div>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <input class="form-input" id="commentInput" placeholder="留言詢問賣家...">
+            <button class="btn btn-primary btn-sm" onclick="addComment()">送出</button>
+          </div>
+        </div>
+      </div>
+      <!-- Info -->
+      <div class="detail-info anim-fade anim-d1">
+        <div class="detail-header">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span id="detailCond" class="prod-cond"></span>
+            <span id="detailViews" style="font-size:12px;color:var(--text3)"></span>
+          </div>
+          <div class="detail-title" id="detailTitle"></div>
+          <div class="detail-price" id="detailPrice"></div>
+          <div class="detail-taxes">含稅價格・賣家支付手續費</div>
+          <div class="detail-tags" id="detailTags"></div>
+        </div>
+        <div class="action-bar">
+          <button class="btn btn-primary btn-lg" style="flex:1" onclick="openPurchase()">立即購買</button>
+          <button class="btn btn-lg" style="border:1.5px solid var(--border);background:var(--surface)" onclick="openChat()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            訊息
+          </button>
+          <button class="heart-action" id="detailHeart" onclick="toggleDetailHeart()">🤍</button>
+        </div>
+        <div class="safe-badges">
+          <div class="safe-badge"><span>🔒</span>安全支付保障</div>
+          <div class="safe-badge"><span>📦</span>7天鑑賞期</div>
+          <div class="safe-badge"><span>✅</span>身份實名認證</div>
+        </div>
+        <div class="detail-section">
+          <div class="ds-title">📋 商品資訊</div>
+          <div class="meta-grid" id="detailMeta"></div>
+        </div>
+        <div class="detail-section">
+          <div class="ds-title">📝 商品說明</div>
+          <div class="detail-desc" id="detailDesc"></div>
+        </div>
+        <div class="detail-section">
+          <div class="ds-title">👤 賣家資訊</div>
+          <div class="seller-row">
+            <div class="seller-ava" id="detailSellerAva" onclick="goProfile()"></div>
+            <div class="seller-info">
+              <div class="seller-name" id="detailSellerName" onclick="goProfile()"></div>
+              <div class="seller-stats" id="detailSellerStats"></div>
+            </div>
+            <button class="seller-btn" onclick="openChat()">聯繫賣家</button>
+          </div>
+        </div>
+        <div class="detail-section">
+          <div class="ds-title">🌟 買家評價</div>
+          <div id="detailReviews"></div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:32px;margin-bottom:48px" class="anim-fade">
+      <div class="ds-title" style="font-size:15px;margin-bottom:16px">相關商品推薦</div>
+      <div class="related-grid" id="relatedGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PROFILE PAGE ════════════════════════════════════ -->
+<div id="page-profile" class="page">
+  <div class="container">
+    <div class="profile-layout">
+      <div class="profile-hero anim-fade">
+        <div class="profile-ava-lg">A</div>
+        <div class="profile-info">
+          <h2>Alex 用戶</h2>
+          <p>📍 台北市 ・ 加入於 2023年3月</p>
+          <div class="profile-stats">
+            <div class="pstat"><div class="pstat-val">4.9</div><div class="pstat-key">評分</div></div>
+            <div class="pstat"><div class="pstat-val">47</div><div class="pstat-key">交易</div></div>
+            <div class="pstat"><div class="pstat-val">12</div><div class="pstat-key">在售</div></div>
+            <div class="pstat"><div class="pstat-val">128</div><div class="pstat-key">關注</div></div>
+          </div>
+        </div>
+        <div style="margin-left:auto;display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-ghost" onclick="editProfile()">✏️ 編輯資料</button>
+          <button class="btn btn-ghost" onclick="showSettings()">⚙️ 設定</button>
+        </div>
+      </div>
+      <div class="profile-tabs">
+        <button class="ptab active" onclick="switchTab(this,'my-listings')">出品中 (12)</button>
+        <button class="ptab" onclick="switchTab(this,'sold')">已售出 (35)</button>
+        <button class="ptab" onclick="switchTab(this,'bought')">購買記錄</button>
+        <button class="ptab" onclick="switchTab(this,'likes')">收藏清單</button>
+        <button class="ptab" onclick="switchTab(this,'reviews')">評價 (47)</button>
+      </div>
+      <div id="tab-my-listings" class="ptab-content active">
+        <div class="profile-grid" id="myListingsGrid"></div>
+      </div>
+      <div id="tab-sold" class="ptab-content">
+        <div id="soldOrders"></div>
+      </div>
+      <div id="tab-bought" class="ptab-content">
+        <div id="boughtOrders"></div>
+      </div>
+      <div id="tab-likes" class="ptab-content">
+        <div class="profile-grid" id="likesGrid"></div>
+      </div>
+      <div id="tab-reviews" class="ptab-content">
+        <div id="reviewsList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FAB ════════════════════════════════════════════ -->
+<button id="fab" onclick="openSellModal()" title="出品商品">
+  <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+
+<!-- ═══ SELL MODAL ══════════════════════════════════════ -->
+<div id="sellModal" class="modal-overlay hidden" onclick="closeSellIfBg(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3>出品商品</h3>
+      <button class="modal-close" onclick="closeSell()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="steps">
+        <div class="step active" id="step1">
+          <div class="step-circle">1</div>
+          <div class="step-label">商品資訊</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step2">
+          <div class="step-circle">2</div>
+          <div class="step-label">定價配送</div>
+        </div>
+        <div class="step-line"></div>
+        <div class="step" id="step3">
+          <div class="step-circle">3</div>
+          <div class="step-label">確認出品</div>
+        </div>
+      </div>
+      <div id="sellStep1">
+        <div class="form-group">
+          <label class="form-label">商品照片 <span>*</span></label>
+          <div class="photo-upload" onclick="addPhotos()">
+            <div class="up-icon">📷</div>
+            <p>點擊上傳商品照片</p>
+            <span>最多10張・JPG/PNG・每張最大5MB</span>
+          </div>
+          <div class="photo-previews" id="photoPreviews">
+            <div class="photo-prev" onclick="removePhoto(this)">👗</div>
+            <div class="photo-prev" onclick="removePhoto(this)">👗</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">商品名稱 <span>*</span></label>
+          <input class="form-input" id="sName" placeholder="例：Uniqlo 羽絨外套 M號 深藍 2023年款">
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">分類 <span>*</span></label>
+            <select class="form-select" id="sCat">
+              <option value="">選擇分類</option>
+              <option>女裝</option><option>男裝</option><option>包款</option>
+              <option>3C電子</option><option>遊戲</option><option>書籍</option>
+              <option>家居</option><option>美妝</option><option>運動</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">品牌</label>
+            <input class="form-input" id="sBrand" placeholder="例：Uniqlo">
+          </div>
+        </div>
+      </div>
+      <div id="sellStep2" class="hidden">
+        <div class="form-group">
+          <label class="form-label">商品狀態 <span>*</span></label>
+          <div class="cond-select">
+            <div class="cond-sel-item" onclick="pickCond(this)" data-val="全新">
+              <span class="csi-label">全新</span>
+              <span class="csi-desc">未拆封未使用</span>
+            </div>
+            <div class="cond-sel-item on" onclick="pickCond(this)" data-val="近全新">
+              <span class="csi-label">近全新</span>
+              <span class="csi-desc">幾乎無使用痕跡</span>
+            </div>
+            <div class="cond-sel-item" onclick="pickCond(this)" data-val="良好">
+              <span class="csi-label">良好</span>
+              <span class="csi-desc">輕微使用痕跡</span>
+            </div>
+            <div class="cond-sel-item" onclick="pickCond(this)" data-val="可接受">
+              <span class="csi-label">可接受</span>
+              <span class="csi-desc">明顯使用但功能正常</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">售價 <span>*</span></label>
+          <div class="price-input-wrap">
+            <span class="price-prefix">NT$</span>
+            <input type="number" id="sPrice" placeholder="0" min="0">
+          </div>
+          <div style="margin-top:6px;font-size:12px;color:var(--text3)">平台手續費：賣出金額 × 5%（買家付款後自動扣除）</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">配送方式</label>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="check-row" onclick="toggleCheck(this)">
+              <div class="custom-cb on"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="check-label">📦 超商取貨（7-11 / 全家）</div>
+            </div>
+            <div class="check-row" onclick="toggleCheck(this)">
+              <div class="custom-cb on"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="check-label">🚚 宅配到府</div>
+            </div>
+            <div class="check-row" onclick="toggleCheck(this)">
+              <div class="custom-cb"><svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              <div class="check-label">🤝 面交自取</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">商品說明</label>
+          <textarea class="form-textarea" id="sDesc" placeholder="詳細描述尺寸、使用次數、瑕疵等，能提高成交機會！"></textarea>
+        </div>
+      </div>
+      <div id="sellStep3" class="hidden">
+        <div style="background:var(--bg);border-radius:var(--r-lg);padding:18px;margin-bottom:16px">
+          <div style="font-size:13px;color:var(--text2);margin-bottom:12px;font-weight:600">確認商品資訊</div>
+          <div id="confirmSummary"></div>
+        </div>
+        <div style="background:var(--orange-light);border:1px solid var(--orange-mid);border-radius:var(--r-lg);padding:16px;display:flex;gap:12px;align-items:flex-start">
+          <span style="font-size:20px;flex-shrink:0">📋</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:4px">出品須知</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.65">請確認商品照片清晰，說明完整。禁止販售仿冒品、違禁品。違反規定將立即下架並停權。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button id="sellBackBtn" class="btn btn-ghost hidden" onclick="sellPrevStep()">上一步</button>
+      <button id="sellNextBtn" class="btn btn-primary" style="flex:1;height:46px;font-size:15px" onclick="sellNextStep()">下一步</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PURCHASE MODAL ══════════════════════════════════ -->
+<div id="purchaseModal" class="modal-overlay hidden" onclick="closePurchaseIfBg(event)">
+  <div class="modal-box purchase-modal" onclick="event.stopPropagation()">
+    <div class="modal-head">
+      <h3>購買商品</h3>
+      <button class="modal-close" onclick="closePurchase()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="purchaseItem" style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--bg);border-radius:var(--r-lg);margin-bottom:20px"></div>
+      <div class="form-group">
+        <label class="form-label">配送方式</label>
+        <select class="form-select" id="buyShipping">
+          <option>📦 超商取貨 — NT$60</option>
+          <option>🚚 宅配到府 — NT$100</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">收件地址</label>
+        <input class="form-input" placeholder="縣市、鄉鎮市區、路段、號碼">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">付款方式</label>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="cond-sel-item on" style="display:flex;align-items:center;gap:10px;padding:12px 14px;flex-direction:row">
+            <span style="font-size:20px">💳</span>
+            <div><span class="csi-label" style="display:inline;font-size:14px">信用卡/簽帳卡</span></div>
+          </div>
+          <div class="cond-sel-item" style="display:flex;align-items:center;gap:10px;padding:12px 14px;flex-direction:row">
+            <span style="font-size:20px">🏦</span>
+            <div><span class="csi-label" style="display:inline;font-size:14px">ATM轉帳</span></div>
+          </div>
+          <div class="cond-sel-item" style="display:flex;align-items:center;gap:10px;padding:12px 14px;flex-direction:row">
+            <span style="font-size:20px">🏪</span>
+            <div><span class="csi-label" style="display:inline;font-size:14px">超商代碼繳費</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot" style="flex-direction:column;gap:4px">
+      <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--text2);margin-bottom:4px">
+        <span>商品金額</span><span id="buyItemPrice"></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--text2);margin-bottom:8px">
+        <span>運費</span><span>NT$60</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-bottom:12px">
+        <span>合計</span><span id="buyTotal" style="color:var(--orange)"></span>
+      </div>
+      <button class="btn btn-primary" style="width:100%;height:46px;font-size:15px" onclick="confirmPurchase()">確認付款</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHAT MODAL ══════════════════════════════════════ -->
+<div id="chatModal" class="modal-overlay hidden" onclick="closeChatIfBg(event)">
+  <div class="modal-box" onclick="event.stopPropagation()" style="max-width:420px">
+    <div class="modal-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="seller-ava" id="chatSellerAva" style="width:36px;height:36px;font-size:14px"></div>
+        <div>
+          <div style="font-size:14px;font-weight:700" id="chatSellerName"></div>
+          <div style="font-size:11px;color:var(--green)">● 線上</div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeChat()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding:16px">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="msg-input-row">
+        <input class="msg-input" id="chatInput" placeholder="輸入訊息..." onkeydown="chatKey(event)">
+        <button class="msg-send" onclick="sendChat()">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST CONTAINER ════════════════════════════════ -->
+<div id="toast-container"></div>
+
+<!-- ═══ SCRIPT ════════════════════════════════════════════════════════════════ -->
+<script>
+/* ── DATA ──────────────────────────────────────────────── */
+const PRODUCTS = [
+  {id:1,name:'Uniqlo 輕量羽絨外套 M號 海軍藍 極少穿',price:890,emoji:'🧥',cat:'男裝',brand:'Uniqlo',cond:'近全新',badge:'熱賣',liked:false,rating:4.9,views:248,seller:'小明',sellerRating:5.0,sellerSales:89,desc:'購於2023年冬，僅穿過3次，幾乎全新。\n內層無起毛，拉鍊順暢，無破損。\n顏色為官網「海軍藍」，實物顏色與圖片相符。\n可議價，誠心要買歡迎出價。',tags:['羽絨','Uniqlo','冬裝','男裝'],size:'M',color:'海軍藍'},
+  {id:2,name:'iPhone 14 Pro 256GB 深紫色 附原廠保固至2025/06',price:22800,emoji:'📱',cat:'3C電子',brand:'Apple',cond:'良好',badge:'',liked:true,rating:5.0,views:512,seller:'科技達人',sellerRating:4.9,sellerSales:156,desc:'自用機，保養良好，無摔機無進水。\n外觀僅有輕微使用痕跡（背面有細微刮痕）。\n原廠保固至 2025年6月，附原廠充電線及保護殼。\n不含 SIM 卡，購買前請確認您的 SIM 規格。',tags:['iPhone','Apple','iPhone14Pro','手機'],storage:'256GB',color:'深紫色'},
+  {id:3,name:'Nintendo Switch OLED 白色主機 附馬利歐卡丁車',price:8500,emoji:'🎮',cat:'遊戲',brand:'Nintendo',cond:'近全新',badge:'',liked:false,rating:4.8,views:189,seller:'遊戲玩家',sellerRating:4.8,sellerSales:43,desc:'使用約半年，保存良好，附原廠底座、充電線。\n贈送遊戲《馬利歐卡丁車8豪華版》實體卡帶一片。\nJoy-Con 搖桿無飄移問題，螢幕無色差。\n附原廠包裝盒。',tags:['Switch','任天堂','Nintendo','遊戲機'],color:'白色'},
+  {id:4,name:'COACH Hadley 托特包 卡其色 附原廠塵袋及紙袋',price:5200,emoji:'👜',cat:'包款',brand:'COACH',cond:'全新',badge:'新品',liked:false,rating:5.0,views:302,seller:'時尚達人',sellerRating:5.0,sellerSales:67,desc:'百貨公司購入，從未使用，完整附原廠塵袋及購買紙袋。\n尺寸：約 38×28×14cm\n材質：防刮皮革，手感柔軟。\n特殊節日禮物，購後決定換款，因此出售。',tags:['COACH','托特包','包包','精品'],size:'L',color:'卡其色'},
+  {id:5,name:'山田照明 Z-Light LED 桌燈 Z-108N 白色',price:650,emoji:'💡',cat:'家居',brand:'山田照明',cond:'良好',badge:'',liked:false,rating:4.7,views:88,seller:'居家達人',sellerRating:4.7,sellerSales:22,desc:'使用約一年，功能正常，可調光可調色溫。\n外觀有輕微刮痕（如圖），不影響使用。\n附原廠電源線，不含燈泡（LED，標準E26接口）。',tags:['桌燈','LED','山田','閱讀燈'],color:'白色'},
+  {id:6,name:"Levi's 501 Original 直筒牛仔褲 W30 L32 復古水洗",price:1200,emoji:'👖',cat:'男裝',brand:"Levi's",cond:'良好',badge:'',liked:true,rating:4.8,views:156,seller:'二手服飾',sellerRating:4.8,sellerSales:112,desc:"購於2022年，穿過數次，已清洗過。\n無破損、無褪色（正常水洗舊化感），五金無鏽蝕。\n尺寸：W30 L32，腰圍約74cm，褲長約82cm。\n顏色為復古深藍水洗款。",tags:["Levi's",'牛仔褲','男裝','復古'],size:'W30 L32',color:'復古深藍'},
+  {id:7,name:'Sony WH-1000XM5 無線降噪耳機 黑色 附收納包',price:7800,emoji:'🎧',cat:'3C電子',brand:'Sony',cond:'近全新',badge:'熱賣',liked:false,rating:5.0,views:421,seller:'音樂愛好者',sellerRating:5.0,sellerSales:34,desc:'使用約2個月，功能完全正常，降噪效果絕佳。\n外觀無刮痕，耳墊無磨損。\n附原廠收納包、USB-C充電線及音源線。\n僅在家使用，保養良好。',tags:['Sony','耳機','降噪','無線'],color:'黑色'},
+  {id:8,name:'哈利波特 精裝全集 1-7冊 台灣版 皇冠出版',price:2200,emoji:'📚',cat:'書籍',brand:'皇冠出版',cond:'良好',badge:'',liked:false,rating:4.6,views:67,seller:'書蟲',sellerRating:4.6,sellerSales:18,desc:'精裝版全集，品相良好，無筆記無劃線。\n封面有輕微磨損（正常使用），書頁完好。\n出版年份：2007-2010台灣初版。\n套盒已遺失，僅單書出售。',tags:['哈利波特','精裝版','全集','小說'],author:'J.K. 羅琳'},
+  {id:9,name:'Nike Air Force 1 Low 白色 US9 / 27cm 全新未穿',price:3200,emoji:'👟',cat:'男裝',brand:'Nike',cond:'全新',badge:'新品',liked:false,rating:4.9,views:278,seller:'球鞋控',sellerRating:4.9,sellerSales:78,desc:'全新從未穿過，購於Nike官網，附鞋盒及防塵袋。\n尺寸：US9 / EU42.5 / 27cm，標準版型。\n經典純白配色，百搭款。\n因尺寸偏大決定出售，非瑕疵品。',tags:['Nike','AF1','球鞋','白鞋'],size:'US9 / 27cm',color:'全白'},
+  {id:10,name:'SK-II 青春露 神仙水 230mL 全新盒裝 免稅購入',price:3500,emoji:'🧴',cat:'美妝',brand:'SK-II',cond:'全新',badge:'',liked:true,rating:5.0,views:193,seller:'保養達人',sellerRating:5.0,sellerSales:55,desc:'免稅商店購入，全新未拆封，盒裝完整。\n容量：230mL\n批號可查，保存期限至2026年。\n原廠正品，附購買收據（可拍照提供）。',tags:['SK-II','神仙水','保養','化妝水'],size:'230mL'},
+  {id:11,name:'樂高 LEGO 42083 Bugatti Chiron 限定版 盒裝完整',price:9900,emoji:'🏎️',cat:'玩具',brand:'LEGO',cond:'全新',badge:'',liked:false,rating:4.9,views:88,seller:'樂高收藏家',sellerRating:4.9,sellerSales:29,desc:'收藏品，盒裝未開封，全新品。\n此款已停產，市場稀缺，值得收藏。\n外盒輕微壓痕（如圖），不影響內容物。\n不接受退換，請確認後再購買。',tags:['LEGO','樂高','Bugatti','模型'],color:'深藍/白'},
+  {id:12,name:'MacBook Air M2 13吋 2022款 星光色 16GB/512GB',price:32000,emoji:'💻',cat:'3C電子',brand:'Apple',cond:'近全新',badge:'熱賣',liked:false,rating:5.0,views:634,seller:'蘋果迷',sellerRating:5.0,sellerSales:203,desc:'2022年8月購入，使用約一年，在家使用為主。\n電池循環次數：87次，電池健康度：100%。\n外觀無刮痕，鍵盤按鍵功能完全正常。\n附原廠30W充電器及充電線。\n已清除個人資料，完全重置。',tags:['MacBook','Apple','筆電','M2'],color:'星光色',storage:'512GB'},
+  {id:13,name:'Dyson V12 Detect Slim 無線吸塵器 紫色 九成新',price:15800,emoji:'🌀',cat:'家居',brand:'Dyson',cond:'近全新',badge:'',liked:false,rating:4.9,views:340,seller:'家電達人',sellerRating:4.9,sellerSales:45,desc:'購入一年，保存良好，附所有配件。\n電池續航力正常，約50分鐘。\n每次使用後都有清洗，使用頻率低（約每週一次）。\n附原廠充電座及六種吸頭。',tags:['Dyson','吸塵器','無線','家電'],color:'紫色'},
+  {id:14,name:'古馳 GG Marmont 小型單肩包 黑色 金釦',price:18500,emoji:'👛',cat:'包款',brand:'GUCCI',cond:'良好',badge:'',liked:true,rating:5.0,views:890,seller:'精品二手',sellerRating:5.0,sellerSales:189,desc:'購自日本二手店，附鑑定書及購買收據。\n品相8成新，有正常使用痕跡（內裡輕微磨損）。\n外皮、五金保存完好，無明顯刮痕。\n尺寸：約 18×14×7cm\n附原廠防塵袋。',tags:['Gucci','精品包','名牌包','單肩包'],color:'黑色/金釦'},
+  {id:15,name:'山葉 YAMAHA 電子鋼琴 P-125 88鍵 附腳架',price:12000,emoji:'🎹',cat:'音樂',brand:'Yamaha',cond:'良好',badge:'',liked:false,rating:4.8,views:127,seller:'音樂教師',sellerRating:4.8,sellerSales:31,desc:'自用練習用琴，保養良好。\n所有按鍵功能正常，觸鍵感佳。\n附腳架（另購）及踏板。\n因換大型鋼琴而出售。\n可安排試彈。',tags:['Yamaha','電鋼琴','88鍵','鋼琴'],color:'黑色'},
+  {id:16,name:'Patagonia 刷毛外套 M號 藍綠色 輕量保暖',price:2800,emoji:'🧤',cat:'男裝',brand:'Patagonia',cond:'良好',badge:'',liked:false,rating:4.7,views:95,seller:'戶外達人',sellerRating:4.7,sellerSales:62,desc:'購於三年前，穿過多次但保存良好。\n洗後保暖性依然正常，無起毛球。\n顏色：官網「Passage Blue」\n尺寸M碼，建議身高170-178cm。',tags:['Patagonia','刷毛','戶外','保暖'],size:'M',color:'藍綠色'},
+];
+
+/* ── STATE ──────────────────────────────────────────────── */
+const state = {
+  liked: new Set(PRODUCTS.filter(p=>p.liked).map(p=>p.id)),
+  currentProduct: null,
+  sellStep: 1,
+  currentCat: '全部',
+  sortMode: 'newest',
+  chat: {},
+};
+
+/* ── UTILS ──────────────────────────────────────────────── */
+function $(id){ return document.getElementById(id); }
+function html(el,h){ el.innerHTML = h; }
+function toast(msg, type='info', dur=2800){
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  $('toast-container').appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transform='translateY(8px)'; t.style.transition='.3s'; setTimeout(()=>t.remove(),300); }, dur);
+}
+function fmtPrice(n){ return 'NT$ '+n.toLocaleString(); }
+function stars(n){ return '★'.repeat(Math.round(n))+'☆'.repeat(5-Math.round(n)); }
+
+/* ── NAVIGATION ─────────────────────────────────────────── */
+function showPageRaw(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el = $('page-'+id);
+  if(el){ el.classList.add('active'); window.scrollTo({top:0,behavior:'smooth'}); }
+}
+function goHome(){ showPageRaw('home'); renderGrid(); }
+function goProfile(){ showPageRaw('profile'); renderProfile(); }
+function showPage(id){ toast('「'+id+'」頁面 — 功能開發中','info'); }
+
+/* ── RENDER PRODUCT GRID ─────────────────────────────────── */
+function getFilteredProducts(){
+  let list = [...PRODUCTS];
+  if(state.currentCat!=='全部') list = list.filter(p=>p.cat===state.currentCat);
+  const conds = [...document.querySelectorAll('#condFilter .cond-tag.on')].map(el=>el.dataset.val);
+  if(conds.length) list = list.filter(p=>conds.includes(p.cond));
+  const minP = parseFloat($('minP').value)||0;
+  const maxP = parseFloat($('maxP').value)||Infinity;
+  list = list.filter(p=>p.price>=minP&&p.price<=maxP);
+  if(state.sortMode==='price_asc') list.sort((a,b)=>a.price-b.price);
+  else if(state.sortMode==='price_desc') list.sort((a,b)=>b.price-a.price);
+  else if(state.sortMode==='popular') list.sort((a,b)=>b.views-a.views);
+  else if(state.sortMode==='rating') list.sort((a,b)=>b.rating-a.rating);
+  else list.sort((a,b)=>b.id-a.id);
+  return list;
+}
+
+function productCard(p, mini=false){
+  const liked = state.liked.has(p.id);
+  const statusHTML = p.badge==='熱賣' ? `<div class="prod-status status-hot">🔥 熱賣</div>` :
+    p.badge==='新品' ? `<div class="prod-status status-new">✨ 新品</div>` :
+    p.badge==='sold' ? `<div class="prod-status status-sold">已售出</div>` : '';
+  return `<div class="prod-card" onclick="openProduct(${p.id})">
+    <div class="prod-img">
+      ${p.emoji ? `<div style="font-size:${mini?'36px':'48px'}">${p.emoji}</div>` : ''}
+      ${statusHTML}
+      <button class="prod-heart ${liked?'liked':''}" onclick="toggleLike(event,${p.id})">${liked?'❤️':'🤍'}</button>
+    </div>
+    <div class="prod-body">
+      <div class="prod-name line-clamp2">${p.name}</div>
+      <div class="prod-price">${fmtPrice(p.price)}</div>
+      <div class="prod-meta">
+        <span class="prod-cond">${p.cond}</span>
+        <span class="prod-stars">★ ${p.rating}</span>
+        <span class="prod-views">${p.views.toLocaleString()} 人看過</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderGrid(){
+  const list = getFilteredProducts();
+  $('resultCount').textContent = list.length;
+  html($('prodGrid'), list.map(p=>productCard(p)).join(''));
+}
+
+/* ── FILTER ACTIONS ──────────────────────────────────────── */
+function filterCat(el, cat){
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  state.currentCat = cat;
+  renderGrid();
+}
+function sortBy(val){ state.sortMode=val; renderGrid(); }
+function applyFilters(){ renderGrid(); toast('已套用篩選條件','success'); }
+function loadMore(){ toast('已載入更多商品 ✓','success'); }
+function toggleCond(el){ el.classList.toggle('on'); }
+function clearCond(){ document.querySelectorAll('#condFilter .cond-tag').forEach(t=>t.classList.remove('on')); }
+function setQP(el,min,max){
+  document.querySelectorAll('.qp-tag').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  $('minP').value = min||'';
+  $('maxP').value = max||'';
+}
+function toggleCheck(el){
+  const cb = el.querySelector('.custom-cb');
+  cb.classList.toggle('on');
+}
+
+/* ── LIKE ────────────────────────────────────────────────── */
+function toggleLike(e, id){
+  e.stopPropagation();
+  const btn = e.currentTarget;
+  btn.classList.add('popping');
+  btn.addEventListener('animationend',()=>btn.classList.remove('popping'),{once:true});
+  if(state.liked.has(id)){
+    state.liked.delete(id);
+    btn.textContent='🤍';
+    toast('已取消收藏');
+  } else {
+    state.liked.add(id);
+    btn.textContent='❤️';
+    toast('已加入收藏 ❤️','success');
+  }
+}
+
+/* ── SEARCH ──────────────────────────────────────────────── */
+const suggestions = ['iPhone','MacBook','Switch','Uniqlo','COACH','Nike','Sony','LEGO','Dyson','Gucci'];
+function onSearchInput(val){
+  const dd = $('searchDropdown');
+  if(!val.trim()){ dd.classList.add('hidden'); return; }
+  const hits = suggestions.filter(s=>s.toLowerCase().includes(val.toLowerCase()));
+  const prods = PRODUCTS.filter(p=>p.name.toLowerCase().includes(val.toLowerCase())).slice(0,3);
+  if(!hits.length&&!prods.length){ dd.classList.add('hidden'); return; }
+  dd.classList.remove('hidden');
+  dd.innerHTML = hits.slice(0,3).map(s=>`<div class="sugg-item" onclick="searchFor('${s}')">
+    <svg class="sugg-icon" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    ${s}
+  </div>`).join('')
+  + prods.map(p=>`<div class="sugg-item" onclick="openProduct(${p.id})">
+    <span style="font-size:16px">${p.emoji}</span>
+    <span style="flex:1">${p.name}</span>
+    <span style="font-size:12px;color:var(--orange);font-weight:700">${fmtPrice(p.price)}</span>
+  </div>`).join('');
+}
+function onSearchKey(e){ if(e.key==='Enter') doSearch(); if(e.key==='Escape') $('searchDropdown').classList.add('hidden'); }
+function searchFor(val){ $('navSearch').value=val; doSearch(); }
+function doSearch(){
+  const q = $('navSearch').value.toLowerCase().trim();
+  $('searchDropdown').classList.add('hidden');
+  if(!q){ goHome(); return; }
+  // filter and show results on home page
+  showPageRaw('home');
+  state.currentCat='全部';
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+  document.querySelector('.cat-pill').classList.add('active');
+  const res = PRODUCTS.filter(p=>p.name.toLowerCase().includes(q)||p.tags?.join(' ').toLowerCase().includes(q));
+  $('resultCount').textContent = res.length;
+  html($('prodGrid'), res.map(p=>productCard(p)).join(''));
+  toast(`找到 ${res.length} 件「${q}」相關商品`,'info');
+}
+document.addEventListener('click', e=>{ if(!e.target.closest('.nav-search')) $('searchDropdown').classList.add('hidden'); });
+
+/* ── PRODUCT DETAIL ──────────────────────────────────────── */
+function openProduct(id){
+  const p = PRODUCTS.find(x=>x.id===id);
+  if(!p) return;
+  state.currentProduct = p;
+  showPageRaw('detail');
+
+  // gallery
+  html($('galleryMain'), `<span style="font-size:110px">${p.emoji}</span>`);
+  html($('galleryThumbs'), [p.emoji,p.emoji,p.emoji,p.emoji].map((e,i)=>`
+    <div class="thumb ${i===0?'active':''}" onclick="selectThumb(this,'${e}')">${e}</div>
+  `).join(''));
+
+  // header
+  $('detailCond').textContent = p.cond;
+  $('detailViews').textContent = `👁 ${p.views.toLocaleString()} 人看過`;
+  $('detailTitle').textContent = p.name;
+  html($('detailPrice'), `${fmtPrice(p.price)} <span>/ 件</span>`);
+  html($('detailTags'), (p.tags||[]).map(t=>`<div class="detail-tag" onclick="searchFor('${t}')">#${t}</div>`).join(''));
+  $('detailHeart').textContent = state.liked.has(p.id)?'❤️':'🤍';
+
+  // meta
+  const metaItems = [
+    ['分類',p.cat],['品牌',p.brand||'—'],
+    ['商品狀態',p.cond],['尺寸/規格',p.size||p.storage||'—'],
+    ['顏色',p.color||'—'],['觀看次數',p.views.toLocaleString()+'次'],
+  ];
+  html($('detailMeta'), metaItems.map(([k,v])=>`
+    <div class="meta-item">
+      <span class="meta-key">${k}</span>
+      <span class="meta-val">${v}</span>
+    </div>`).join(''));
+
+  // desc
+  $('detailDesc').textContent = p.desc||'賣家尚未填寫說明。';
+
+  // seller
+  const initials = p.seller.slice(0,2);
+  html($('detailSellerAva'), initials);
+  $('detailSellerName').textContent = p.seller;
+  html($('detailSellerStats'), `⭐ ${p.sellerRating} 評分・已售出 ${p.sellerSales} 件`);
+
+  // reviews
+  const sampleReviews = [
+    {name:'買家A',stars:'★★★★★',text:'商品與描述相符，包裝很仔細，賣家回覆很快，很愉快的交易體驗！',date:'2024/03/15'},
+    {name:'買家B',stars:'★★★★☆',text:'商品品質不錯，稍微有一點使用痕跡但在接受範圍內。',date:'2024/02/28'},
+    {name:'買家C',stars:'★★★★★',text:'超級棒的賣家！非常值得信賴，下次還會回購。',date:'2024/01/10'},
+  ];
+  html($('detailReviews'), sampleReviews.map(r=>`
+    <div class="comment-item">
+      <div class="cmt-ava">${r.name[0]}</div>
+      <div class="cmt-body">
+        <div class="cmt-name">${r.name}</div>
+        <div class="cmt-stars">${r.stars}</div>
+        <div class="cmt-text">${r.text}</div>
+        <div class="cmt-date">${r.date}</div>
+      </div>
+    </div>`).join(''));
+
+  // comments
+  if(!state.chat[id]) state.chat[id]=[
+    {name:'買家',text:'請問這個還有貨嗎？'},
+    {name:p.seller,text:'有的，歡迎購買！'},
+  ];
+  renderComments(id);
+
+  // related
+  const related = PRODUCTS.filter(x=>x.cat===p.cat&&x.id!==p.id).slice(0,6);
+  html($('relatedGrid'), related.map(x=>productCard(x,true)).join(''));
+}
+
+function selectThumb(el, emoji){
+  document.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  html($('galleryMain'), `<span style="font-size:110px">${emoji}</span>`);
+}
+function toggleDetailHeart(){
+  const id = state.currentProduct?.id;
+  if(!id) return;
+  if(state.liked.has(id)){
+    state.liked.delete(id);
+    $('detailHeart').textContent='🤍';
+    toast('已取消收藏');
+  } else {
+    state.liked.add(id);
+    $('detailHeart').textContent='❤️';
+    toast('已加入收藏 ❤️','success');
+  }
+}
+function addComment(){
+  const inp = $('commentInput');
+  const text = inp.value.trim();
+  if(!text) return;
+  const id = state.currentProduct?.id;
+  if(!state.chat[id]) state.chat[id]=[];
+  state.chat[id].push({name:'我',text});
+  inp.value='';
+  renderComments(id);
+  setTimeout(()=>{
+    const replies = ['謝謝詢問！可以私訊我','好的，稍等我確認一下','感謝關注，歡迎購買！'];
+    state.chat[id].push({name:state.currentProduct.seller, text:replies[Math.floor(Math.random()*replies.length)]});
+    renderComments(id);
+  }, 1200);
+}
+function renderComments(id){
+  const msgs = state.chat[id]||[];
+  html($('comments'), msgs.map(m=>`
+    <div class="comment-item">
+      <div class="cmt-ava">${m.name[0]}</div>
+      <div class="cmt-body">
+        <div class="cmt-name">${m.name}</div>
+        <div class="cmt-text">${m.text}</div>
+      </div>
+    </div>`).join(''));
+  const el = $('comments');
+  el.scrollTop = el.scrollHeight;
+}
+
+/* ── PURCHASE MODAL ──────────────────────────────────────── */
+function openPurchase(){
+  const p = state.currentProduct;
+  if(!p) return;
+  html($('purchaseItem'), `
+    <div style="font-size:40px">${p.emoji}</div>
+    <div style="flex:1">
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.4">${p.name}</div>
+      <div style="font-size:13px;color:var(--text2)">${p.cond}</div>
+    </div>
+    <div style="font-size:17px;font-weight:800;color:var(--orange);white-space:nowrap">${fmtPrice(p.price)}</div>
+  `);
+  $('buyItemPrice').textContent = fmtPrice(p.price);
+  $('buyTotal').textContent = fmtPrice(p.price+60);
+  $('purchaseModal').classList.remove('hidden');
+}
+function closePurchase(){ $('purchaseModal').classList.add('hidden'); }
+function closePurchaseIfBg(e){ if(e.target===$('purchaseModal')) closePurchase(); }
+function confirmPurchase(){
+  closePurchase();
+  setTimeout(()=>toast('🎉 購買成功！賣家將在24小時內確認出貨。','success',4000),200);
+}
+
+/* ── CHAT MODAL ──────────────────────────────────────────── */
+function openChat(){
+  const p = state.currentProduct;
+  if(!p) return;
+  html($('chatSellerAva'), p.seller.slice(0,2));
+  $('chatSellerName').textContent = p.seller;
+  if(!state.chat['dm_'+p.id]) state.chat['dm_'+p.id]=[
+    {type:'received',name:p.seller,text:`您好！感謝您詢問《${p.name.slice(0,15)}...》`},
+    {type:'received',name:p.seller,text:'有任何問題歡迎隨時詢問！'},
+  ];
+  renderDM(p.id);
+  $('chatModal').classList.remove('hidden');
+  setTimeout(()=>{ const c=$('chatMessages'); c.scrollTop=c.scrollHeight; },50);
+}
+function closeChat(){ $('chatModal').classList.add('hidden'); }
+function closeChatIfBg(e){ if(e.target===$('chatModal')) closeChat(); }
+function renderDM(id){
+  const msgs = state.chat['dm_'+id]||[];
+  html($('chatMessages'), msgs.map(m=>`
+    <div class="msg ${m.type}">
+      ${m.type==='received'?`<div class="msg-name">${m.name}</div>`:''}
+      <div class="msg-bubble">${m.text}</div>
+    </div>`).join(''));
+}
+function sendChat(){
+  const inp = $('chatInput');
+  const text = inp.value.trim();
+  const p = state.currentProduct;
+  if(!text||!p) return;
+  if(!state.chat['dm_'+p.id]) state.chat['dm_'+p.id]=[];
+  state.chat['dm_'+p.id].push({type:'sent',name:'我',text});
+  inp.value='';
+  renderDM(p.id);
+  const c = $('chatMessages');
+  c.scrollTop = c.scrollHeight;
+  setTimeout(()=>{
+    const autoReplies = [
+      '好的，已收到您的訊息！',
+      '謝謝詢問，我確認後馬上回覆您。',
+      '可以議價，您有什麼想法嗎？',
+      '商品目前還在，歡迎下單！',
+    ];
+    state.chat['dm_'+p.id].push({type:'received',name:p.seller,text:autoReplies[Math.floor(Math.random()*autoReplies.length)]});
+    renderDM(p.id);
+    c.scrollTop = c.scrollHeight;
+  }, 900+Math.random()*600);
+}
+function chatKey(e){ if(e.key==='Enter') sendChat(); }
+
+/* ── SELL MODAL ──────────────────────────────────────────── */
+function openSellModal(){ state.sellStep=1; updateSellStep(); $('sellModal').classList.remove('hidden'); }
+function closeSell(){ $('sellModal').classList.add('hidden'); }
+function closeSellIfBg(e){ if(e.target===$('sellModal')) closeSell(); }
+function updateSellStep(){
+  const s = state.sellStep;
+  $('sellStep1').classList.toggle('hidden', s!==1);
+  $('sellStep2').classList.toggle('hidden', s!==2);
+  $('sellStep3').classList.toggle('hidden', s!==3);
+  $('sellBackBtn').classList.toggle('hidden', s===1);
+  $('sellNextBtn').textContent = s===3?'確認出品':'下一步';
+  ['step1','step2','step3'].forEach((id,i)=>{
+    const el=$(id), active=i+1===s, done=i+1<s;
+    el.classList.toggle('active',active);
+    el.classList.toggle('done',done);
+  });
+}
+function sellNextStep(){
+  if(state.sellStep<3){ state.sellStep++; updateSellStep(); if(state.sellStep===3) buildConfirm(); }
+  else { closeSell(); setTimeout(()=>toast('🎉 商品出品成功！審核通過後將會上架（約2小時）。','success',4000),200); }
+}
+function sellPrevStep(){ if(state.sellStep>1){ state.sellStep--; updateSellStep(); } }
+function pickCond(el){ document.querySelectorAll('.cond-sel-item').forEach(i=>i.classList.remove('on')); el.classList.add('on'); }
+function addPhotos(){ toast('開啟相機/相簿功能（示範）','info'); }
+function removePhoto(el){ if(confirm('移除此照片？')) el.remove(); }
+function buildConfirm(){
+  const name = $('sName').value||'（未填）';
+  const cat = $('sCat').value||'（未選）';
+  const price = $('sPrice').value||'0';
+  const cond = document.querySelector('.cond-sel-item.on')?.dataset.val||'近全新';
+  html($('confirmSummary'),`
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:14px">
+      <div style="display:flex;gap:8px"><span style="color:var(--text3);width:70px">商品名稱</span><span style="font-weight:600;flex:1">${name}</span></div>
+      <div style="display:flex;gap:8px"><span style="color:var(--text3);width:70px">分類</span><span>${cat}</span></div>
+      <div style="display:flex;gap:8px"><span style="color:var(--text3);width:70px">狀態</span><span>${cond}</span></div>
+      <div style="display:flex;gap:8px"><span style="color:var(--text3);width:70px">售價</span><span style="color:var(--orange);font-weight:700;font-size:16px">NT$ ${parseInt(price).toLocaleString()}</span></div>
+      <div style="display:flex;gap:8px"><span style="color:var(--text3);width:70px">平台費</span><span style="color:var(--text2)">NT$ ${Math.round(parseInt(price)*0.05).toLocaleString()}（5%）</span></div>
+      <div style="border-top:1px solid var(--border);padding-top:8px;display:flex;gap:8px"><span style="color:var(--text3);width:70px">實收金額</span><span style="font-weight:700;font-size:16px">NT$ ${Math.round(parseInt(price)*0.95).toLocaleString()}</span></div>
+    </div>`);
+}
+
+/* ── PROFILE PAGE ────────────────────────────────────────── */
+function renderProfile(){
+  // my listings
+  html($('myListingsGrid'), PRODUCTS.slice(0,12).map(p=>productCard(p,true)).join(''));
+
+  // sold orders
+  html($('soldOrders'), PRODUCTS.slice(0,5).map((p,i)=>`
+    <div class="order-item" onclick="toast('訂單詳情功能開發中','info')">
+      <div class="order-thumb">${p.emoji}</div>
+      <div class="order-info">
+        <div class="order-name line-clamp2" style="max-width:300px">${p.name}</div>
+        <div class="order-price">${fmtPrice(p.price)}</div>
+        <div class="order-date">2024/0${i+1}/1${i+2}</div>
+      </div>
+      <div class="order-status ${i<3?'os-done':i===3?'os-ship':'os-cancel'}">${i<3?'已完成':i===3?'運送中':'已取消'}</div>
+    </div>`).join(''));
+
+  // bought orders
+  html($('boughtOrders'), PRODUCTS.slice(6,11).map((p,i)=>`
+    <div class="order-item" onclick="toast('訂單詳情功能開發中','info')">
+      <div class="order-thumb">${p.emoji}</div>
+      <div class="order-info">
+        <div class="order-name line-clamp2" style="max-width:300px">${p.name}</div>
+        <div class="order-price">${fmtPrice(p.price)}</div>
+        <div class="order-date">2024/0${i+1}/0${i+5}</div>
+      </div>
+      <div class="order-status ${i<2?'os-done':'os-ship'}">${i<2?'已完成':'運送中'}</div>
+    </div>`).join(''));
+
+  // likes
+  const likedProds = PRODUCTS.filter(p=>state.liked.has(p.id));
+  if(likedProds.length)
+    html($('likesGrid'), likedProds.map(p=>productCard(p,true)).join(''));
+  else
+    html($('likesGrid'),'<div class="empty-state"><div class="es-icon">🤍</div><p>還沒有收藏商品<br>快去逛逛吧！</p></div>');
+
+  // reviews
+  const revData = [
+    {name:'買家D',stars:'★★★★★',text:'非常誠信的賣家，商品完美！'},
+    {name:'買家E',stars:'★★★★★',text:'快速出貨，包裝仔細，讚！'},
+    {name:'買家F',stars:'★★★★☆',text:'整體很好，溝通順暢。'},
+    {name:'買家G',stars:'★★★★★',text:'超滿意，下次還會再買！'},
+  ];
+  html($('reviewsList'), revData.map(r=>`
+    <div class="review-item">
+      <div class="review-top">
+        <div class="rev-ava">${r.name[0]}</div>
+        <div>
+          <div class="rev-name">${r.name}</div>
+          <div class="rev-stars">${r.stars}</div>
+        </div>
+        <div class="rev-date">2024/03</div>
+      </div>
+      <div class="rev-text">${r.text}</div>
+    </div>`).join(''));
+}
+
+function switchTab(btn, id){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.ptab-content').forEach(t=>t.classList.remove('active'));
+  $('tab-'+id).classList.add('active');
+}
+function editProfile(){ toast('編輯個人資料功能開發中','info'); }
+function showSettings(){ toast('設定頁面功能開發中','info'); }
+
+/* ── INIT ───────────────────────────────────────────────── */
+renderGrid();
+</script>
+</body>
+</html>

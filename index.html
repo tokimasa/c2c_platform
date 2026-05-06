@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LoopMarket | C2C Marketplace</title>
+    <link rel="preconnect" href="https://images.unsplash.com" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-shell">
+        <a class="brand" href="#" aria-label="LoopMarket home">
+          <span class="brand-mark">L</span>
+          <span>LoopMarket</span>
+        </a>
+        <form class="search" id="searchForm">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m21 21-4.3-4.3m2.3-5.2a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" />
+          </svg>
+          <input id="searchInput" type="search" placeholder="Search fashion, games, books, brands" autocomplete="off" />
+        </form>
+        <nav class="header-actions" aria-label="Main">
+          <button class="ghost-button" data-view="watchlist">Watchlist</button>
+          <button class="ghost-button" data-view="messages">Messages</button>
+          <button class="sell-button" id="openSell">Sell</button>
+        </nav>
+      </div>
+      <div class="category-strip" id="categoryStrip" aria-label="Categories"></div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Circular marketplace</p>
+          <h1>Find a second life for the things people still love.</h1>
+          <p>Browse buyer-protected listings, make offers, save favorites, and list your own item in under a minute.</p>
+        </div>
+        <div class="hero-panel" aria-label="Marketplace activity">
+          <div>
+            <span class="metric">14.8k</span>
+            <span class="metric-label">new listings today</span>
+          </div>
+          <div>
+            <span class="metric">¥300</span>
+            <span class="metric-label">deal shelf starts at</span>
+          </div>
+          <div>
+            <span class="metric">4.9</span>
+            <span class="metric-label">seller trust score</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="quick-rails" aria-label="Discovery rails">
+        <button class="rail active" data-filter="all">Recommended</button>
+        <button class="rail" data-filter="deal">¥300 starts</button>
+        <button class="rail" data-filter="new">Just listed</button>
+        <button class="rail" data-filter="verified">Verified sellers</button>
+        <button class="rail" data-filter="freeShipping">Free shipping</button>
+      </section>
+
+      <section class="market-layout">
+        <aside class="filters" aria-label="Filters">
+          <div class="filter-card">
+            <h2>Refine</h2>
+            <label>
+              Category
+              <select id="categorySelect">
+                <option value="all">All categories</option>
+              </select>
+            </label>
+            <label>
+              Condition
+              <select id="conditionSelect">
+                <option value="all">Any condition</option>
+                <option value="Like new">Like new</option>
+                <option value="Good">Good</option>
+                <option value="Used">Used</option>
+              </select>
+            </label>
+            <label>
+              Max price
+              <input id="priceRange" type="range" min="300" max="60000" step="500" value="60000" />
+              <span id="priceValue">Up to ¥60,000</span>
+            </label>
+          </div>
+          <div class="filter-card">
+            <h2>Popular brands</h2>
+            <div class="brand-cloud" id="brandCloud"></div>
+          </div>
+        </aside>
+
+        <section class="listings-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Today’s shelf</p>
+              <h2 id="resultsTitle">Recommended for you</h2>
+            </div>
+            <select id="sortSelect" aria-label="Sort listings">
+              <option value="recommended">Recommended</option>
+              <option value="low">Lowest price</option>
+              <option value="high">Highest price</option>
+              <option value="newest">Newest</option>
+            </select>
+          </div>
+          <div class="listing-grid" id="listingGrid"></div>
+          <p class="empty-state" id="emptyState" hidden>No listings match those filters.</p>
+        </section>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Mobile navigation">
+      <button data-view="home">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3V10.5Z" /></svg>
+        Home
+      </button>
+      <button data-view="alerts">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4" /></svg>
+        Alerts
+      </button>
+      <button class="bottom-sell" id="openSellMobile">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+        Sell
+      </button>
+      <button data-view="watchlist">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" /></svg>
+        Saved
+      </button>
+      <button data-view="profile">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21a8 8 0 1 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" /></svg>
+        Me
+      </button>
+    </nav>
+
+    <dialog class="modal" id="itemModal">
+      <button class="icon-close" id="closeItem" aria-label="Close item details">×</button>
+      <div class="modal-body" id="itemDetails"></div>
+    </dialog>
+
+    <dialog class="modal sell-modal" id="sellModal">
+      <button class="icon-close" id="closeSell" aria-label="Close sell form">×</button>
+      <form id="sellForm" class="sell-form">
+        <h2>List an item</h2>
+        <label>
+          Title
+          <input name="title" required placeholder="Vintage denim jacket" />
+        </label>
+        <label>
+          Category
+          <select name="category" required></select>
+        </label>
+        <div class="form-row">
+          <label>
+            Price
+            <input name="price" type="number" min="300" step="100" required placeholder="3200" />
+          </label>
+          <label>
+            Condition
+            <select name="condition">
+              <option>Like new</option>
+              <option>Good</option>
+              <option>Used</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          Photo URL
+          <input name="image" type="url" placeholder="https://images.unsplash.com/..." />
+        </label>
+        <button class="sell-button" type="submit">Publish listing</button>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
