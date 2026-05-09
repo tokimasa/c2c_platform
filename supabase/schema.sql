@@ -67,6 +67,7 @@ create table if not exists public.messages (
 create or replace function public.touch_updated_at()
 returns trigger
 language plpgsql
+set search_path = public
 as $$
 begin
   new.updated_at = now();
@@ -281,6 +282,17 @@ begin
 end;
 $$;
 
+grant execute on function public.purchase_item(uuid) to authenticated;
+revoke execute on function public.touch_updated_at() from public;
+revoke execute on function public.handle_new_user() from public;
+revoke execute on function public.is_platform_admin() from public;
+revoke execute on function public.prevent_profile_self_promotion() from public;
+revoke execute on function public.purchase_item(uuid) from public;
+revoke execute on function public.touch_updated_at() from anon, authenticated;
+revoke execute on function public.handle_new_user() from anon, authenticated;
+revoke execute on function public.is_platform_admin() from anon, authenticated;
+revoke execute on function public.prevent_profile_self_promotion() from anon, authenticated;
+revoke execute on function public.purchase_item(uuid) from anon;
 grant execute on function public.purchase_item(uuid) to authenticated;
 
 do $$
