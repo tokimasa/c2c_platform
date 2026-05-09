@@ -1,6 +1,13 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 
+type CookieStore = Awaited<ReturnType<typeof cookies>>;
+type CookieToSet = {
+  name: string;
+  value: string;
+  options?: Parameters<CookieStore["set"]>[2];
+};
+
 export function hasSupabaseEnv() {
   return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }
@@ -19,7 +26,7 @@ export async function createSupabaseServerClient() {
       getAll() {
         return cookieStore.getAll();
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet: CookieToSet[]) {
         cookiesToSet.forEach(({ name, value, options }) => {
           try {
             cookieStore.set(name, value, options);
