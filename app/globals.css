@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f6f7f9;
+  color: #1f2933;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.shell {
+  width: min(1220px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.card {
+  border: 1px solid #e6e8ec;
+  border-radius: 8px;
+  background: white;
+}
+
+.btn {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid #d4d9e2;
+  background: white;
+  padding: 0 14px;
+  color: #1f2933;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.btn-primary {
+  border-color: #e93845;
+  background: #e93845;
+  color: white;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+  color: #344054;
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.field input,
+.field select,
+.field textarea {
+  min-height: 42px;
+  border: 1px solid #d4d9e2;
+  border-radius: 8px;
+  background: white;
+  color: #1f2933;
+  padding: 0 11px;
+}
+
+.field textarea {
+  min-height: 96px;
+  padding-top: 10px;
+}
+
+.hero-bg {
+  background:
+    linear-gradient(90deg, rgba(31, 41, 51, 0.88), rgba(31, 41, 51, 0.42)),
+    url("https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1600&q=80") center / cover;
+}

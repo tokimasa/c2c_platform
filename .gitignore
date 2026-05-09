@@ -16,6 +16,7 @@ temp/
 
 # Dependencies/build outputs
 node_modules/
+.next/
 dist/
 build/
 .cache/
