@@ -148,7 +148,7 @@ alter table public.messages enable row level security;
 drop policy if exists "profiles are readable by authenticated users" on public.profiles;
 create policy "profiles are readable by authenticated users"
 on public.profiles for select
-to authenticated
+to anon, authenticated
 using (true);
 
 drop policy if exists "users update own profile" on public.profiles;
@@ -162,9 +162,14 @@ drop policy if exists "active items are publicly readable" on public.items;
 create policy "active items are publicly readable"
 on public.items for select
 to anon, authenticated
+using (status = 'active');
+
+drop policy if exists "item participants can read private items" on public.items;
+create policy "item participants can read private items"
+on public.items for select
+to authenticated
 using (
-  status = 'active'
-  or seller_id = auth.uid()
+  seller_id = auth.uid()
   or public.is_platform_admin()
   or exists (
     select 1 from public.transactions t
@@ -293,6 +298,7 @@ revoke execute on function public.handle_new_user() from anon, authenticated;
 revoke execute on function public.is_platform_admin() from anon, authenticated;
 revoke execute on function public.prevent_profile_self_promotion() from anon, authenticated;
 revoke execute on function public.purchase_item(uuid) from anon;
+grant execute on function public.is_platform_admin() to authenticated;
 grant execute on function public.purchase_item(uuid) to authenticated;
 
 do $$
